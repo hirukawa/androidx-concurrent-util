@@ -148,7 +148,7 @@ public class WorkerResult<V> implements Serializable {
         fragment.getParentFragmentManager().setFragmentResultListener(requestKey, fragment.getViewLifecycleOwner(), new FragmentResultListener() {
             @Override
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-                WorkerResult workerResult = WorkerResult.fromBundle(result);
+                WorkerResult<V> workerResult = WorkerResult.fromBundle(result);
                 workerResult.dispatch(_onSucceeded, _onFailed, _onCancelled, _onCompleted);
             }
         });

@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Lifecycle;
@@ -31,19 +32,35 @@ public abstract class WorkerDialogFragment<V> extends DialogFragment {
         getParentFragmentManager().setFragmentResult(getRequestKey(), result.toBundle());
     }
 
-    public void show(@NonNull FragmentManager manager, @NonNull String requestKey, @NonNull Callable<V> worker) {
+    /** 指定したフラグメントのフラグメント・マネージャーにダイアログ・フラグメントを追加して、ダイアログを表示します。
+     * 指定したリクエスト・キーはフラグメントのタグとしても使用されます。
+     * 指定したリクエスト・キーのフラグメントが既に存在している場合、このメソッドは何も実行しません。
+     *
+     * @param fragment フラグメント
+     * @param requestKey setFragmentResultListenerで結果を受け取る時に使用するリクエスト・キー。
+     * @param worker 非同期で実行する処理
+     * @return フラグメントが追加された場合は true、フラグメントが既に存在する場合は false
+     */
+    public boolean show(@NonNull Fragment fragment, @NonNull String requestKey, @NonNull Callable<V> worker) {
+        return show(fragment.getParentFragmentManager(), requestKey, worker);
+    }
+
+    /** 指定したフラグメント・マネージャーにダイアログ・フラグメントを追加して、ダイアログを表示します。
+     * 指定したリクエスト・キーはフラグメントのタグとしても使用されます。
+     * 指定したリクエスト・キーのフラグメントが既に存在している場合、このメソッドは何も実行しません。
+     *
+     * @param manager フラグメント・マネージャー
+     * @param requestKey setFragmentResultListenerで結果を受け取る時に使用するリクエスト・キー
+     * @param worker 非同期で実行する処理
+     * @return フラグメントが追加された場合は true、フラグメントが既に存在する場合は false
+     */
+    public boolean show(@NonNull FragmentManager manager, @NonNull String requestKey, @NonNull Callable<V> worker) {
+        if(manager.findFragmentByTag(requestKey) != null) {
+            return false;
+        }
         this.worker = worker;
         super.show(manager, requestKey);
-    }
-
-    public int show(@NonNull FragmentTransaction transaction, @NonNull String requestKey, @NonNull Callable<V> worker) {
-        this.worker = worker;
-        return super.show(transaction, requestKey);
-    }
-
-    public void showNow(@NonNull FragmentManager manager, @NonNull String requestKey, @NonNull Callable<V> worker) {
-        this.worker = worker;
-        super.showNow(manager, requestKey);
+        return true;
     }
 
     @NonNull
