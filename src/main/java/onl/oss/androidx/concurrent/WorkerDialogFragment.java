@@ -52,7 +52,7 @@ public abstract class WorkerDialogFragment<V> extends DialogFragment {
      * @param manager フラグメント・マネージャー
      * @param requestKey setFragmentResultListenerで結果を受け取る時に使用するリクエスト・キー
      * @param worker 非同期で実行する処理
-     * @return フラグメントが追加された場合は true、フラグメントが既に存在する場合は false
+     * @return フラグメントが追加される場合は true、フラグメントが既に存在する場合は false
      */
     public boolean show(@NonNull FragmentManager manager, @NonNull String requestKey, @NonNull Callable<V> worker) {
         if(manager.findFragmentByTag(requestKey) != null) {
@@ -62,6 +62,38 @@ public abstract class WorkerDialogFragment<V> extends DialogFragment {
         super.show(manager, requestKey);
         return true;
     }
+
+    /** 指定したフラグメントのフラグメント・マネージャーにダイアログ・フラグメントを追加して、ダイアログを即座に表示します。
+     * 指定したリクエスト・キーはフラグメントのタグとしても使用されます。
+     * 指定したリクエスト・キーのフラグメントが既に存在している場合、このメソッドは何も実行しません。
+     *
+     * @param fragment フラグメント
+     * @param requestKey setFragmentResultListenerで結果を受け取る時に使用するリクエスト・キー
+     * @param worker 非同期で実行する処理
+     * @return フラグメントが追加された場合は true、フラグメントが既に存在する場合は false
+     */
+    public boolean showNow(@NonNull Fragment fragment, @NonNull String requestKey, @NonNull Callable<V> worker) {
+        return showNow(fragment.getParentFragmentManager(), requestKey, worker);
+    }
+
+    /** 指定したフラグメント・マネージャーにダイアログ・フラグメントを追加して、ダイアログを即座に表示します。
+     * 指定したリクエスト・キーはフラグメントのタグとしても使用されます。
+     * 指定したリクエスト・キーのフラグメントが既に存在している場合、このメソッドは何も実行しません。
+     *
+     * @param manager フラグメント・マネージャー
+     * @param requestKey setFragmentResultListenerで結果を受け取る時に使用するリクエスト・キー
+     * @param worker 非同期で実行する処理
+     * @return フラグメントが追加された場合は true、フラグメントが既に存在する場合は false
+     */
+    public boolean showNow(@NonNull FragmentManager manager, @NonNull String requestKey, @NonNull Callable<V> worker) {
+        if(manager.findFragmentByTag(requestKey) != null) {
+            return false;
+        }
+        this.worker = worker;
+        super.showNow(manager, requestKey);
+        return true;
+    }
+
 
     @NonNull
     @Override
